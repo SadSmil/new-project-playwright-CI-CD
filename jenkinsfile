@@ -1,0 +1,31 @@
+pipeline {
+    agent {
+        docker { 
+            image 'mcr.microsoft.com/playwright:v1.59.1-noble'
+            args '-u=root --entrypoint='
+        }  
+    }
+    
+    parameters {        
+        booleanParam(name: 'check', defaultValue: false, description: 'Décoché = test spécifique | Coché = tous les tests')
+        choice(name: 'tags', choices: ['creation', 'login', 'profil', 'devis'], description: 'Choix du tag de test à exécuter')
+        choice(name: 'navigateur', choices: ['chromium', 'firefox', 'webkit'], description: 'Choix du navigateur')
+    }
+
+    stages {
+        stage('Lancer les tests Playwright') {
+            steps {
+                script {
+                    if (params.check) {
+                        echo "Lancement detous les tests..."
+                        sh "npx playwright test"                       
+                    } 
+                    else {
+                        echo "Lancement ciblé -> Navigateur: ${params.navigateur} | Tag: @${params.tags}"
+                        sh "npx playwright test --project=${params.navigateur} --grep @${params.tags}"
+                    }
+                }
+            }
+        }
+    }
+}
