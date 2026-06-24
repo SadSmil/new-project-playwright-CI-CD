@@ -13,8 +13,10 @@ pipeline {
     }
 
     stages {
-        stage("install dependences"){
-            sh "npm install"
+      stage("install dependences"){
+            steps {
+                sh "npm install"
+            }
         }
         stage('Lancer les tests Playwright') {
             steps {
